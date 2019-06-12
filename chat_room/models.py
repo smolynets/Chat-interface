@@ -47,7 +47,7 @@ class Message(models.Model):
 
     text = models.CharField(max_length=255, default="")
     room = models.ForeignKey(
-        verbose_name=_("Message"), to="chat_room.Room",
+        verbose_name=_("Room"), null=True, to="chat_room.Room",
         on_delete=models.CASCADE
     )
     author = models.ForeignKey(verbose_name=_("author"), to="chat_room.User",
