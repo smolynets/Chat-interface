@@ -7,6 +7,24 @@ from django.db import models
 from django.utils.translation import gettext as _
 
 
+class User(AbstractUser):
+    """
+    Set User model.
+
+    This model is inherited from default user model.
+    """
+
+    pass
+
+    class Meta:
+        ordering = ["date_joined"]
+        verbose_name = _("User")
+        verbose_name_plural = _("Users")
+
+    def __str__(self):
+        return self.username
+
+
 class Room(models.Model):
     """
     Set Room model.
