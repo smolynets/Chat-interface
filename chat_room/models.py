@@ -20,3 +20,21 @@ class Room(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Message(models.Model):
+    """
+    Set message model.
+    """
+
+    room = models.ForeignKey(
+        verbose_name=_("Message"), to="chat_room.Room",
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = _("Message")
+        verbose_name_plural = _("Messages")
+
+    def __str__(self):
+        return self.id
