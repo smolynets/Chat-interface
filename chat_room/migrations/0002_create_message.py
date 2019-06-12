@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('chat_room', '0001_creare_room'),
+        ('chat_room', '0001_create_room'),
     ]
 
     operations = [
