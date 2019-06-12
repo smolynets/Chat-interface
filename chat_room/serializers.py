@@ -1,5 +1,5 @@
 from django.contrib.auth import password_validation
-from .models import User
+from .models import Message, User
 from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -55,3 +55,9 @@ class UserCreateSerializer(serializers.ModelSerializer):
         user.set_password(user.password)
         user.save()
         return user
+
+
+class MessageModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ("id", "text", "room", "author")
