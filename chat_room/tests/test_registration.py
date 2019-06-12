@@ -1,7 +1,7 @@
 """
 Tests.
 
-Test for registration and login login.
+Test for registration.
 """
 
 from django.contrib.auth.models import User
@@ -10,19 +10,19 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 
-class RegistrationLoginTest(APITestCase):
+class RegistrationTest(APITestCase):
     """
-    This test checks regostration and login processes.
+    This test checks regostration.
 
     This test checks next scenarios:
-        1. Successful registration and login.
+        1. Successful registration.
     """
 
-    def test_registration_login_success(self):
+    def test_registration(self):
         """
-        Check registration andlogin.
+        Check registration.
 
-        Successful registration andlogin.
+        Successful registration.
         """
         users_count = User.objects.count()
         post_data = {"username": "test_user", "email": "test@email.com",
@@ -34,11 +34,3 @@ class RegistrationLoginTest(APITestCase):
         user = User.objects.last()
         self.assertEqual(user.email, "test@email.com")
         self.assertEqual(user.username, "test_user")
-
-        self.client.logout()
-
-        # # login with username
-        # post_data = {"username": "test_user", "password": "password"}
-        # response = self.client.post(reverse("login"), post_data,
-        #                             format="json")
-        # self.assertEqual(response.status_code, status.HTTP_200_OK)
