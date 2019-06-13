@@ -29,4 +29,4 @@ class MessageViewSet(ModelViewSet):
     """
     serializer_class = MessageModelSerializer
     queryset = Message.objects.all()
-    # pagination_class = MessagesPagination
+    pagination_class = MessagesPagination
