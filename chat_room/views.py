@@ -7,8 +7,9 @@ This file contains views for the chat_room application.
 from rest_framework.generics import CreateAPIView
 from rest_framework.viewsets import ModelViewSet
 
+from .models import Message
+from .pagination import MessagesPagination
 from .serializers import MessageModelSerializer, UserCreateSerializer
-from .models import User
 
 
 class RegisterUserView(CreateAPIView):
@@ -27,4 +28,5 @@ class MessageViewSet(ModelViewSet):
     A viewset for viewing and editing message instances.
     """
     serializer_class = MessageModelSerializer
-    queryset = User.objects.all()
+    queryset = Message.objects.all()
+    # pagination_class = MessagesPagination
