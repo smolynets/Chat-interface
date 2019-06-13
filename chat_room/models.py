@@ -3,7 +3,9 @@ Models for chat_room app.
 """
 
 from django.contrib.auth.models import AbstractUser
-from django.db import models
+from django.db import models, transaction
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -64,3 +66,17 @@ class Message(models.Model):
 
     def __str__(self):
         return self.id
+
+
+@receiver(post_save, sender=Message)
+def post_save_handler(sender, instance, created, **kwargs):
+    """
+    Post save handler.
+
+    Changing of last_message of related User.
+    """
+
+    if instance.author:
+        user = User.objects.get(id=instance.author.id)
+        user.last_message = timezone.now()
+        user.save(update_fields=["last_message"])

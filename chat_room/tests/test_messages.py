@@ -41,7 +41,8 @@ class MessageTest(APITestCase):
 
         post_data = {
             "text": "test_text",
-            "room": room.id
+            "room": room.id,
+            "author": user.id
         }
         Messages_count_before = Message.objects.count()
         response = self.client.post(reverse("message-list"), post_data,
@@ -51,6 +52,10 @@ class MessageTest(APITestCase):
         self.assertEqual(response.data["room"], room.id)
         # self.assertEqual(response.data["author"], user.id)
         self.assertEqual(Message.objects.count(), Messages_count_before + 1)
+        self.assertFalse(user.last_message)
+        user.refresh_from_db()
+        self.assertEqual(user.last_message.strftime("%m/%d/%Y, %H:%M"),
+                         timezone.now().strftime("%m/%d/%Y, %H:%M"))
 
     def test_post_message_without_data(self):
         """
