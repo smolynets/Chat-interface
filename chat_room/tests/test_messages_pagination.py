@@ -35,6 +35,7 @@ class MessageTest(APITestCase):
         response = self.client.get(reverse("message-list"), format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], Message.objects.all().count())
+        self.assertEqual(Message.objects.all().count(), 12)
         self.assertEqual(len(response.data["results"]), 10)
 
     def test_messages_pagination_1_element(self):
@@ -51,6 +52,7 @@ class MessageTest(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], Message.objects.all().count())
+        self.assertEqual(Message.objects.all().count(), 12)
         self.assertEqual(len(response.data["results"]), 1)
 
     def test_messages_pagination_12_element(self):
