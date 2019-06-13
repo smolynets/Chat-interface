@@ -6,12 +6,12 @@ Test for login.
 
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from ..models import User
+from .test_base import APITestBaseClass
 
 
-class LoginTest(APITestCase):
+class LoginTest(APITestBaseClass):
     """
     This test checks login processes.
 

@@ -7,13 +7,13 @@ from datetime import timedelta
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.test import APITestCase
+from .test_base import APITestBaseClass
 
 from ..models import Message, Room, User
-from .factories import MessageFactory, RoomFactory, UserFactory
+from .factories import MessageFactory
 
 
-class MessageTest(APITestCase):
+class MessageTest(APITestBaseClass):
     """
     This test checks messages.
 
@@ -34,8 +34,7 @@ class MessageTest(APITestCase):
             password="password"
         )
         post_data = {"username": "test2_user", "password": "password"}
-        response = self.client.post(reverse("login"), post_data,
-                                    format="json")
+        response = self.client.login(username="test2_user", password="password")
 
         room = Room.objects.create(name="test_room")
 

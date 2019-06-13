@@ -6,13 +6,13 @@ from urllib.parse import urlencode
 
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
 
 from ..models import Message
-from .factories import MessageFactory, RoomFactory, UserFactory
+from .factories import MessageFactory
+from .test_base import APITestBaseClass
 
 
-class MessageTest(APITestCase):
+class MessageTest(APITestBaseClass):
     """
     This test checks messages.
 
