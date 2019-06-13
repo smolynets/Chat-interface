@@ -2,7 +2,10 @@
 Tests for messages.
 """
 
+from datetime import timedelta
+
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
@@ -83,3 +86,59 @@ class MessageTest(APITestCase):
         saved_messages = [message.id for message in Message.objects.all()[:10]]
         for message in response.data["results"]:
             self.assertIn(message["id"], saved_messages)
+
+    def test_put_message(self):
+        """
+        Check put.
+
+        Successful changed message.
+        """
+        
+        message = MessageFactory(text="put_test")
+        self.assertEqual(message.text, "put_test")
+        response = self.client.put(reverse("message-detail", args=[message.id]),
+                                   {"text": "put_test2"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        message.refresh_from_db()
+        self.assertEqual(message.text, "put_test2")
+
+    def test_putch_message(self):
+        """
+        Check patch.
+
+        Successful changed message.
+        """
+        
+        message = MessageFactory(text="put_test")
+        self.assertEqual(message.text, "put_test")
+        response = self.client.patch(reverse("message-detail", args=[message.id]),
+                                   {"text": "put_test2"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        message.refresh_from_db()
+        self.assertEqual(message.text, "put_test2")
+
+    def test_age_message(self):
+        """
+        Check patch.
+
+        Successful changed message.
+        """
+        
+        message = MessageFactory(text="put_test", created=(
+            timezone.now() - timedelta(minutes=30))
+        )
+        self.assertEqual(message.text, "put_test")
+
+        response = self.client.put(reverse("message-detail",
+                                   args=[message.id]),
+                                   {"text": "put_test2"}, format="json")                    
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        message.refresh_from_db()
+        self.assertEqual(message.text, "put_test")
+
+        response = self.client.patch(reverse("message-detail",
+                                     args=[message.id]),
+                                     {"text": "put_test2"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        message.refresh_from_db()
+        self.assertEqual(message.text, "put_test")
