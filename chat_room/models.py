@@ -15,7 +15,8 @@ class User(AbstractUser):
     This model is inherited from default user model.
     """
 
-    pass
+    last_message = models.DateTimeField(_("last message"),
+                                        default=None)
 
     class Meta:
         ordering = ["date_joined"]
