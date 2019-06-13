@@ -24,17 +24,20 @@ class RegistrationTest(APITestCase):
         Successful created message.
         """
 
-        room = Room.objects.create(name="test_room")
         user = User.objects.create_user(
             username="test2_user",
             email="test@emil.com",
             password="password"
         )
+        post_data = {"username": "test2_user", "password": "password"}
+        response = self.client.post(reverse("login"), post_data,
+                                    format="json")
+
+        room = Room.objects.create(name="test_room")
 
         post_data = {
             "text": "test_text",
-            "room": room.id,
-            "author": user.id
+            "room": room.id
         }
         Messages_count_before = Message.objects.count()
         response = self.client.post(reverse("message-list"), post_data,

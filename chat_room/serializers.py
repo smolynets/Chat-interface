@@ -58,6 +58,18 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
 
 class MessageModelSerializer(serializers.ModelSerializer):
+    """
+    MessageModelSerializer class.
+    """
+
     class Meta:
         model = Message
         fields = ("id", "text", "room", "author")
+
+    def create(self, validated_data):
+        """
+        Create Message instance with current logged user.
+        """
+
+        validated_data["author"] = self.context["request"].user.id
+        return Message.objects.create(**validated_data)
