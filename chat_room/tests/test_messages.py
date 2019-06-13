@@ -74,20 +74,9 @@ class MessageTest(APITestCase):
         Successful created message.
         """
 
-        user = UserFactory()
-        post_data = {"username": user.username, "password": user.password}
-        response = self.client.post(reverse("login"), post_data,
-                                    format="json")
-
-        room = RoomFactory()
         MessageFactory.create_batch(12)
 
-        post_data = {
-            "text": "test_text",
-            "room": room.id
-        }
-        response = self.client.get(reverse("message-list"), post_data,
-                                   format="json")
+        response = self.client.get(reverse("message-list"), format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 12)
         self.assertEqual(len(response.data["results"]), 10)
