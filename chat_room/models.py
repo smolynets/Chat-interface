@@ -4,6 +4,7 @@ Models for chat_room app.
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 
@@ -53,6 +54,7 @@ class Message(models.Model):
     author = models.ForeignKey(verbose_name=_("author"), to="chat_room.User",
                                null=True, related_name='author',
                                on_delete=models.CASCADE)
+    created = models.DateTimeField(_('Created'), default=timezone.now)
 
     class Meta:
         ordering = ["-id"]
