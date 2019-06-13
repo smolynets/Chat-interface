@@ -55,6 +55,7 @@ class Message(models.Model):
                                on_delete=models.CASCADE)
 
     class Meta:
+        ordering = ["-id"]
         verbose_name = _("Message")
         verbose_name_plural = _("Messages")
 
