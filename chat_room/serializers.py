@@ -70,7 +70,6 @@ class MessageModelSerializer(serializers.ModelSerializer):
         """
         Create Message instance with current logged user.
         """
-        import ipdb; ipdb.set_trace()
 
-        validated_data["author"] = self.context["request"].user.id
+        validated_data["author"] = self.context["request"].user
         return Message.objects.create(**validated_data)

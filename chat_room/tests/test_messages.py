@@ -10,7 +10,7 @@ from rest_framework import status
 from .test_base import APITestBaseClass
 
 from ..models import Message, Room, User
-from .factories import MessageFactory
+from .factories import MessageFactory, UserFactory
 
 
 class MessageTest(APITestBaseClass):
@@ -33,15 +33,14 @@ class MessageTest(APITestBaseClass):
             email="test@emil.com",
             password="password"
         )
-        post_data = {"username": "test2_user", "password": "password"}
-        response = self.client.login(username="test2_user", password="password")
+        response = self.client.login(username="test2_user",
+                                     password="password")
 
         room = Room.objects.create(name="test_room")
 
         post_data = {
             "text": "test_text",
-            "room": room.id,
-            "author": user.id
+            "room": room.id
         }
         Messages_count_before = Message.objects.count()
         response = self.client.post(reverse("message-list"), post_data,
