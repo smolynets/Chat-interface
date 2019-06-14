@@ -10,7 +10,7 @@ from rest_framework import status
 from .test_base import APITestBaseClass
 
 from ..models import Message, Room, User
-from .factories import MessageFactory, UserFactory
+from .factories import MessageFactory
 
 
 class MessageTest(APITestBaseClass):
@@ -18,23 +18,31 @@ class MessageTest(APITestBaseClass):
     This test checks messages.
 
     This test checks next scenarios:
-        1. Successful create message.
+        1. Successful create message by post method with current user
+        2. Failed creation without post data.
+        3. Successful got list by get method.
+        4. Successful changed message by put method.
+        5. Successful changed message by patch method.
+        6. Can't  get messages older 30 minutes.
     """
 
-    def test_post_message(self):
+    def setUp(self):
         """
-        Check create.
-
-        Successful created message.
+        Creeate User.
         """
-
-        user = User.objects.create_user(
-            username="test2_user",
+        self.user = User.objects.create_user(
+            username="test_user",
             email="test@emil.com",
             password="password"
         )
-        response = self.client.login(username="test2_user",
-                                     password="password")
+
+    def test_post_message(self):
+        """
+        Successful create message by post method with current user.
+        """
+
+        self.assertTrue(self.client.login(username=self.user.username,
+                        password="password"))
 
         room = Room.objects.create(name="test_room")
 
@@ -48,18 +56,16 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["text"], "test_text")
         self.assertEqual(response.data["room"], room.id)
-        # self.assertEqual(response.data["author"], user.id)
+        self.assertEqual(response.data["author"], self.user.id)
         self.assertEqual(Message.objects.count(), Messages_count_before + 1)
-        self.assertFalse(user.last_message)
-        user.refresh_from_db()
-        self.assertEqual(user.last_message.strftime("%m/%d/%Y, %H:%M"),
+        self.assertFalse(self.user.last_message)
+        self.user.refresh_from_db()
+        self.assertEqual(self.user.last_message.strftime("%m/%d/%Y, %H:%M"),
                          timezone.now().strftime("%m/%d/%Y, %H:%M"))
 
     def test_post_message_without_data(self):
         """
-        Check create.
-
-        Successful created message.
+        Failed creation without post data.
         """
 
         post_data = {
@@ -75,9 +81,7 @@ class MessageTest(APITestBaseClass):
 
     def test_get_message(self):
         """
-        Check create.
-
-        Successful created message.
+        Successful got list by get method.
         """
 
         MessageFactory.create_batch(12)
@@ -92,14 +96,15 @@ class MessageTest(APITestBaseClass):
 
     def test_put_message(self):
         """
-        Check put.
-
-        Successful changed message.
+        Successful changed message by put method.
         """
-        
-        message = MessageFactory(text="put_test")
+
+        self.assertTrue(self.client.login(username=self.user.username,
+                        password="password"))
+        message = MessageFactory(text="put_test", author=self.user)
         self.assertEqual(message.text, "put_test")
-        response = self.client.put(reverse("message-detail", args=[message.id]),
+        response = self.client.put(reverse("message-detail",
+                                   args=[message.id]),
                                    {"text": "put_test2"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         message.refresh_from_db()
@@ -107,26 +112,25 @@ class MessageTest(APITestBaseClass):
 
     def test_putch_message(self):
         """
-        Check patch.
-
-        Successful changed message.
+        Successful changed message by patch method.
         """
-        
-        message = MessageFactory(text="put_test")
+
+        self.assertTrue(self.client.login(username=self.user.username,
+                        password="password"))
+        message = MessageFactory(text="put_test", author=self.user)
         self.assertEqual(message.text, "put_test")
-        response = self.client.patch(reverse("message-detail", args=[message.id]),
-                                   {"text": "put_test2"}, format="json")
+        response = self.client.patch(reverse("message-detail",
+                                     args=[message.id]),
+                                     {"text": "put_test2"}, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test2")
 
     def test_age_message(self):
         """
-        Check patch.
-
-        Successful changed message.
+        Can't get messages older 30 minutes.
         """
-        
+
         message = MessageFactory(text="put_test", created=(
             timezone.now() - timedelta(minutes=30))
         )
