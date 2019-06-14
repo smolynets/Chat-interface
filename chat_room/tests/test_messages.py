@@ -36,6 +36,12 @@ class MessageTest(APITestBaseClass):
             password="password"
         )
 
+        self.user_two = User.objects.create_user(
+            username="test2_user",
+            email="test@emil2.com",
+            password="password"
+        )
+
     def test_post_message(self):
         """
         Successful create message by post method with current user.
@@ -110,7 +116,25 @@ class MessageTest(APITestBaseClass):
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test2")
 
-    def test_putch_message(self):
+    def test_put_message_not_author(self):
+        """
+        Failed changed message by put method if current user is not author.
+        """
+
+        self.assertTrue(self.client.login(username=self.user_two.username,
+                        password="password"))
+        message = MessageFactory(text="put_test", author=self.user)
+        self.assertEqual(message.text, "put_test")
+        response = self.client.put(reverse("message-detail",
+                                   args=[message.id]),
+                                   {"text": "put_test2"}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(str(response.data[0]),
+                         "Only author of message can update")
+        message.refresh_from_db()
+        self.assertEqual(message.text, "put_test")
+
+    def test_patch_message(self):
         """
         Successful changed message by patch method.
         """
@@ -125,6 +149,23 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test2")
+
+    def test_patch_message_not_author(self):
+        """
+        Failed changed message by patch method if current user is not author.
+        """
+
+        self.assertTrue(self.client.login(username=self.user_two.username,
+                        password="password"))
+        message = MessageFactory(text="put_test", author=self.user)
+        self.assertEqual(message.text, "put_test")
+        response = self.client.patch(reverse("message-detail",
+                                     args=[message.id]),
+                                     {"text": "put_test2"}, format="json")
+        self.assertEqual(str(response.data[0]),
+                         "Only author of message can update")
+        message.refresh_from_db()
+        self.assertEqual(message.text, "put_test")
 
     def test_age_message(self):
         """
