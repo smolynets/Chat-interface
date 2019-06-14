@@ -155,7 +155,7 @@ class MessageTest(APITestBaseClass):
 
     def test_age_message(self):
         """
-        Can't get messages older 30 minutes.
+        Can't update messages older than 30 minutes.
         """
 
         message = MessageFactory(text="put_test", created=(
