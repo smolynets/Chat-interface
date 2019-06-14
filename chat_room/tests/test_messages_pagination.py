@@ -17,7 +17,9 @@ class MessageTest(APITestBaseClass):
     This test checks messages.
 
     This test checks next scenarios:
-        1. Successful create message.
+        1. Successful got 10 message as default pagination.
+        2. Successful got 1 message with parameter 1.
+        3. Failed got 12 message with parameter 12.
     """
 
     def _build_url(self, params, url):
@@ -26,9 +28,7 @@ class MessageTest(APITestBaseClass):
 
     def test_messages_default_pagination(self):
         """
-        Check pagination messages list.
-
-        Pagination by 1 element.
+        Successful got 10 message as default pagination.
         """
         MessageFactory.create_batch(12)
 
@@ -40,9 +40,7 @@ class MessageTest(APITestBaseClass):
 
     def test_messages_pagination_1_element(self):
         """
-        Check pagination messages list.
-
-        Pagination by 1 element.
+        Successful got 1 message with parameter 1.
         """
         MessageFactory.create_batch(12)
 
@@ -57,9 +55,7 @@ class MessageTest(APITestBaseClass):
 
     def test_messages_pagination_12_element(self):
         """
-        Check pagination messages list.
-
-        Pagination by 12 element.
+        Failed got 12 message with parameter 12.
         """
         MessageFactory.create_batch(12)
 
