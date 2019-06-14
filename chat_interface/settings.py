@@ -27,10 +27,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-# AUTHENTICATION_BACKENDS = [
-#     "chat_room.auth.CustomModelBackend",
-# ]
-
 
 # Application definition
 
