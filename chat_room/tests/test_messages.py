@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework import status
 from .test_base import APITestBaseClass
 
-from ..models import Message, Room, User
+from ..models import Message, Room
 from .factories import MessageFactory
 
 
@@ -25,22 +25,6 @@ class MessageTest(APITestBaseClass):
         5. Successful changed message by patch method.
         6. Can't  get messages older 30 minutes.
     """
-
-    def setUp(self):
-        """
-        Creeate User.
-        """
-        self.user = User.objects.create_user(
-            username="test_user",
-            email="test@emil.com",
-            password="password"
-        )
-
-        self.user_two = User.objects.create_user(
-            username="test2_user",
-            email="test@emil2.com",
-            password="password"
-        )
 
     def test_post_message(self):
         """

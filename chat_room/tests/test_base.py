@@ -3,9 +3,10 @@ This test is inherited by tests of other apps.
 """
 
 from django.urls import reverse
-
 from rest_framework.test import APIClient, APITestCase
 from rest_framework_simplejwt.settings import api_settings
+
+from ..models import User
 
 
 class APIRestAuthJWTClient(APIClient):
@@ -41,5 +42,21 @@ class APITestBaseClass(APITestCase):
 
     Get APITestBaseClass.
     """
+
+    def setUp(self):
+        """
+        Creeate User.
+        """
+        self.user = User.objects.create_user(
+            username="test_user",
+            email="test@emil.com",
+            password="password"
+        )
+
+        self.user_two = User.objects.create_user(
+            username="test2_user",
+            email="test@emil2.com",
+            password="password"
+        )
 
     client_class = APIRestAuthJWTClient

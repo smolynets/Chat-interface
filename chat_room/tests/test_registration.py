@@ -25,7 +25,7 @@ class RegistrationTest(APITestBaseClass):
         Successful registration.
         """
         users_count = User.objects.count()
-        post_data = {"username": "test_user", "email": "test@email.com",
+        post_data = {"username": "register_user", "email": "test@email.com",
                      "password": "T12r4567"}
         response = self.client.post(reverse("register_user"), post_data,
                                     format="json")
@@ -33,7 +33,7 @@ class RegistrationTest(APITestBaseClass):
         self.assertEqual(users_count + 1, User.objects.count())
         user = User.objects.last()
         self.assertEqual(user.email, "test@email.com")
-        self.assertEqual(user.username, "test_user")
+        self.assertEqual(user.username, "register_user")
 
     def test_registration_no_username(self):
         """
@@ -52,7 +52,7 @@ class RegistrationTest(APITestBaseClass):
         Failed registration without email.
         """
         users_count = User.objects.count()
-        post_data = {"username": "test_user", "email": "",
+        post_data = {"username": "register_user", "email": "",
                      "password": "T12r4567"}
         response = self.client.post(reverse("register_user"), post_data,
                                     format="json")
@@ -64,7 +64,7 @@ class RegistrationTest(APITestBaseClass):
         Failed registration without password.
         """
         users_count = User.objects.count()
-        post_data = {"username": "test_user", "email": "test@email.com",
+        post_data = {"username": "register_user", "email": "test@email.com",
                      "password": ""}
         response = self.client.post(reverse("register_user"), post_data,
                                     format="json")
