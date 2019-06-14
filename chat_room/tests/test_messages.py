@@ -80,9 +80,11 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["count"], 12)
         self.assertEqual(len(response.data["results"]), 10)
-        saved_messages = [message.id for message in Message.objects.all()[:10]]
+        first_messages = [message.id for message in Message.objects.all()[:10]]
+        last_messages = [message.id for message in Message.objects.all()[10:]]
         for message in response.data["results"]:
-            self.assertIn(message["id"], saved_messages)
+            self.assertIn(message["id"], first_messages)
+            self.assertNotIn(message["id"], last_messages)
 
     def test_put_message(self):
         """
