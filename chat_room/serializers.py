@@ -3,6 +3,7 @@ from .models import Message, User
 from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from django.utils.translation import gettext as _
 
 
 class UserCreateSerializer(serializers.ModelSerializer):
@@ -73,3 +74,21 @@ class MessageModelSerializer(serializers.ModelSerializer):
 
         validated_data["author"] = self.context["request"].user
         return Message.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Only authenticated user and author can update message.
+        """
+
+        if self.context["request"].method.upper() in ["PUT", "PATCH"]:
+            if not self.context["request"].user.is_authenticated:
+                raise serializers.ValidationError(
+                    _("Only authenticated user can update")
+                )
+            if self.context["request"].user != instance.author:
+                raise serializers.ValidationError(
+                    _("Only author of message can update")
+                )
+        instance.text = validated_data.get('text', instance.text)
+        instance.save()
+        return instance
