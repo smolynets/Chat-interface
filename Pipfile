@@ -10,6 +10,7 @@ django = "*"
 djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 factory-boy = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.6"
