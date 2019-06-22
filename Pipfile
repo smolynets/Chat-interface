@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+ipdb = "*"
 
 [packages]
 django = "*"
@@ -11,6 +12,7 @@ djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 factory-boy = "*"
 pytest = "*"
+pytest-django = "*"
 
 [requires]
 python_version = "3.6"
