@@ -1,5 +1,5 @@
 from django.contrib.auth import password_validation
-from .models import Message, User
+from .models import Comment, Message, User
 from django.core import exceptions
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -15,8 +15,8 @@ class UserCreateSerializer(serializers.ModelSerializer):
     """
 
     password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(validators=[UniqueValidator(
-        queryset=User.objects.all())]
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all())]
     )
 
     class Meta:
@@ -58,14 +58,22 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
 
 
+class CommentModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "text"
+
+
 class MessageModelSerializer(serializers.ModelSerializer):
     """
     MessageModelSerializer class.
     """
 
+    comments = CommentModelSerializer(many=True, read_only=True)
+
     class Meta:
         model = Message
-        fields = ("id", "text", "room", "author")
+        fields = ("id", "text", "room", "author", "comments")
 
     def create(self, validated_data):
         """
@@ -89,6 +97,6 @@ class MessageModelSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     _("Only author of message can update")
                 )
-        instance.text = validated_data.get('text', instance.text)
+        instance.text = validated_data.get("text", instance.text)
         instance.save()
         return instance

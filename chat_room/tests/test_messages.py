@@ -31,18 +31,15 @@ class MessageTest(APITestBaseClass):
         Successful create message by post method with current user.
         """
 
-        self.assertTrue(self.client.login(username=self.user.username,
-                        password="password"))
+        self.assertTrue(
+            self.client.login(username=self.user.username, password="password")
+        )
 
         room = Room.objects.create(name="test_room")
 
-        post_data = {
-            "text": "test_text",
-            "room": room.id
-        }
+        post_data = {"text": "test_text", "room": room.id}
         Messages_count_before = Message.objects.count()
-        response = self.client.post(reverse("message-list"), post_data,
-                                    format="json")
+        response = self.client.post(reverse("message-list"), post_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data["text"], "test_text")
         self.assertEqual(response.data["room"], room.id)
@@ -50,22 +47,19 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(Message.objects.count(), Messages_count_before + 1)
         self.assertFalse(self.user.last_message)
         self.user.refresh_from_db()
-        self.assertEqual(self.user.last_message.strftime("%m/%d/%Y, %H:%M"),
-                         timezone.now().strftime("%m/%d/%Y, %H:%M"))
+        self.assertEqual(
+            self.user.last_message.strftime("%m/%d/%Y, %H:%M"),
+            timezone.now().strftime("%m/%d/%Y, %H:%M"),
+        )
 
     def test_post_message_without_data(self):
         """
         Failed creation without post data.
         """
 
-        post_data = {
-            "text": "",
-            "room": None,
-            "author": None
-        }
+        post_data = {"text": "", "room": None, "author": None}
         Messages_count_before = Message.objects.count()
-        response = self.client.post(reverse("message-list"), post_data,
-                                    format="json")
+        response = self.client.post(reverse("message-list"), post_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(Message.objects.count(), Messages_count_before)
 
@@ -91,13 +85,16 @@ class MessageTest(APITestBaseClass):
         Successful changed message by put method.
         """
 
-        self.assertTrue(self.client.login(username=self.user.username,
-                        password="password"))
+        self.assertTrue(
+            self.client.login(username=self.user.username, password="password")
+        )
         message = MessageFactory(text="put_test", author=self.user)
         self.assertEqual(message.text, "put_test")
-        response = self.client.put(reverse("message-detail",
-                                   args=[message.id]),
-                                   {"text": "put_test2"}, format="json")
+        response = self.client.put(
+            reverse("message-detail", args=[message.id]),
+            {"text": "put_test2"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test2")
@@ -107,16 +104,18 @@ class MessageTest(APITestBaseClass):
         Failed changed message by put method if current user is not author.
         """
 
-        self.assertTrue(self.client.login(username=self.user_two.username,
-                        password="password"))
+        self.assertTrue(
+            self.client.login(username=self.user_two.username, password="password")
+        )
         message = MessageFactory(text="put_test", author=self.user)
         self.assertEqual(message.text, "put_test")
-        response = self.client.put(reverse("message-detail",
-                                   args=[message.id]),
-                                   {"text": "put_test2"}, format="json")
+        response = self.client.put(
+            reverse("message-detail", args=[message.id]),
+            {"text": "put_test2"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(str(response.data[0]),
-                         "Only author of message can update")
+        self.assertEqual(str(response.data[0]), "Only author of message can update")
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test")
 
@@ -125,13 +124,16 @@ class MessageTest(APITestBaseClass):
         Successful changed message by patch method.
         """
 
-        self.assertTrue(self.client.login(username=self.user.username,
-                        password="password"))
+        self.assertTrue(
+            self.client.login(username=self.user.username, password="password")
+        )
         message = MessageFactory(text="put_test", author=self.user)
         self.assertEqual(message.text, "put_test")
-        response = self.client.patch(reverse("message-detail",
-                                     args=[message.id]),
-                                     {"text": "put_test2"}, format="json")
+        response = self.client.patch(
+            reverse("message-detail", args=[message.id]),
+            {"text": "put_test2"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test2")
@@ -141,15 +143,17 @@ class MessageTest(APITestBaseClass):
         Failed changed message by patch method if current user is not author.
         """
 
-        self.assertTrue(self.client.login(username=self.user_two.username,
-                        password="password"))
+        self.assertTrue(
+            self.client.login(username=self.user_two.username, password="password")
+        )
         message = MessageFactory(text="put_test", author=self.user)
         self.assertEqual(message.text, "put_test")
-        response = self.client.patch(reverse("message-detail",
-                                     args=[message.id]),
-                                     {"text": "put_test2"}, format="json")
-        self.assertEqual(str(response.data[0]),
-                         "Only author of message can update")
+        response = self.client.patch(
+            reverse("message-detail", args=[message.id]),
+            {"text": "put_test2"},
+            format="json",
+        )
+        self.assertEqual(str(response.data[0]), "Only author of message can update")
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test")
 
@@ -158,21 +162,25 @@ class MessageTest(APITestBaseClass):
         Can't update messages older than 30 minutes.
         """
 
-        message = MessageFactory(text="put_test", created=(
-            timezone.now() - timedelta(minutes=30))
+        message = MessageFactory(
+            text="put_test", created=(timezone.now() - timedelta(minutes=30))
         )
         self.assertEqual(message.text, "put_test")
 
-        response = self.client.put(reverse("message-detail",
-                                   args=[message.id]),
-                                   {"text": "put_test2"}, format="json")                    
+        response = self.client.put(
+            reverse("message-detail", args=[message.id]),
+            {"text": "put_test2"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test")
 
-        response = self.client.patch(reverse("message-detail",
-                                     args=[message.id]),
-                                     {"text": "put_test2"}, format="json")
+        response = self.client.patch(
+            reverse("message-detail", args=[message.id]),
+            {"text": "put_test2"},
+            format="json",
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         message.refresh_from_db()
         self.assertEqual(message.text, "put_test")
