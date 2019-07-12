@@ -17,8 +17,9 @@ class User(AbstractUser):
     This model is inherited from default user model.
     """
 
-    last_message = models.DateTimeField(_("last message"), default=None,
-                                        blank=True, null=True)
+    last_message = models.DateTimeField(
+        _("last message"), default=None, blank=True, null=True
+    )
 
     class Meta:
         ordering = ["date_joined"]
@@ -51,18 +52,43 @@ class Message(models.Model):
 
     text = models.CharField(max_length=255, default="")
     room = models.ForeignKey(
-        verbose_name=_("Room"), null=True, to="chat_room.Room",
-        on_delete=models.CASCADE
+        verbose_name=_("Room"), null=True, to="chat_room.Room", on_delete=models.CASCADE
     )
-    author = models.ForeignKey(verbose_name=_("author"), to="chat_room.User",
-                               null=True, related_name='author',
-                               on_delete=models.CASCADE)
-    created = models.DateTimeField(_('Created'), default=timezone.now)
+    author = models.ForeignKey(
+        verbose_name=_("author"),
+        to="chat_room.User",
+        null=True,
+        related_name="author",
+        on_delete=models.CASCADE,
+    )
+    created = models.DateTimeField(_("Created"), default=timezone.now)
 
     class Meta:
         ordering = ["-id"]
         verbose_name = _("Message")
         verbose_name_plural = _("Messages")
+
+    def __str__(self):
+        return str(self.id)
+
+
+class Comment(models.Model):
+    """
+    Set Comment model.
+    """
+
+    text = models.CharField(max_length=255, default="")
+    message = models.ForeignKey(
+        verbose_name=_("Message"),
+        null=True,
+        to="chat_room.Message",
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        ordering = ["-id"]
+        verbose_name = _("Comment")
+        verbose_name_plural = _("Comments")
 
     def __str__(self):
         return str(self.id)
