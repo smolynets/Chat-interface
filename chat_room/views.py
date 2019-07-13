@@ -29,6 +29,7 @@ class MessageViewSet(ModelViewSet):
     """
     A viewset for viewing and editing message instances.
     """
+
     serializer_class = MessageModelSerializer
     pagination_class = MessagesPagination
 

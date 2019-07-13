@@ -9,8 +9,9 @@ from django.utils import timezone
 from rest_framework import status
 from .test_base import APITestBaseClass
 
-from ..models import Message, Room
+from ..models import Comment, Message, Room
 from .factories import MessageFactory
+from ..serializers import MessageModelSerializer
 
 
 class MessageTest(APITestBaseClass):
@@ -19,11 +20,12 @@ class MessageTest(APITestBaseClass):
 
     This test checks next scenarios:
         1. Successful create message by post method with current user
-        2. Failed creation without post data.
-        3. Successful got list by get method.
-        4. Successful changed message by put method.
-        5. Successful changed message by patch method.
-        6. Can't  get messages older 30 minutes.
+        2. Successful creation of message without comments.
+        3. Failed creation without post data.
+        4. Successful got list by get method.
+        5. Successful changed message by put method.
+        6. Successful changed message by patch method.
+        7. Can't  get messages older 30 minutes.
     """
 
     def test_post_message(self):
@@ -36,8 +38,13 @@ class MessageTest(APITestBaseClass):
         )
 
         room = Room.objects.create(name="test_room")
+        comment = Comment.objects.create(text="test_room")
 
-        post_data = {"text": "test_text", "room": room.id}
+        post_data = {
+            "text": "test_text",
+            "room": room.id,
+            "comments": [{"text": "fsd"}],
+        }
         Messages_count_before = Message.objects.count()
         response = self.client.post(reverse("message-list"), post_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -52,12 +59,35 @@ class MessageTest(APITestBaseClass):
             timezone.now().strftime("%m/%d/%Y, %H:%M"),
         )
 
+    def test_post_message_without_comment(self):
+        """
+        Successful create message by post method without comments.
+        """
+
+        self.assertTrue(
+            self.client.login(username=self.user.username, password="password")
+        )
+
+        room = Room.objects.create(name="test_room")
+        comment = Comment.objects.create(text="test_room")
+
+        post_data = {"text": "test_text", "room": room.id}
+        Messages_count_before = Message.objects.count()
+        response = self.client.post(reverse("message-list"), post_data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(Message.objects.count(), Messages_count_before + 1)
+
     def test_post_message_without_data(self):
         """
         Failed creation without post data.
         """
 
-        post_data = {"text": "", "room": None, "author": None}
+        post_data = {
+            "text": "",
+            "room": None,
+            "author": None,
+            "comments": [{"text": "fsd"}],
+        }
         Messages_count_before = Message.objects.count()
         response = self.client.post(reverse("message-list"), post_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
@@ -92,7 +122,7 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(message.text, "put_test")
         response = self.client.put(
             reverse("message-detail", args=[message.id]),
-            {"text": "put_test2"},
+            {"text": "put_test2", "comments": [{"text": "fsd"}]},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -111,7 +141,7 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(message.text, "put_test")
         response = self.client.put(
             reverse("message-detail", args=[message.id]),
-            {"text": "put_test2"},
+            {"text": "put_test2", "comments": [{"text": "fsd"}]},
             format="json",
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
