@@ -77,6 +77,23 @@ class MessageTest(APITestBaseClass):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Message.objects.count(), Messages_count_before + 1)
 
+    def test_create_comment(self):
+        """
+        Successful create comment for some message.
+        """
+
+        self.assertTrue(
+            self.client.login(username=self.user.username, password="password")
+        )
+
+        room = Room.objects.create(name="test_room")
+        message = Message.objects.create(text="test_text", room=room)
+        self.assertEqual(Message.objects.count(), 1)
+        comment = Comment.objects.create(text="test_room", message=message)
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(comment.message, message)
+        self.assertEqual(Comment.objects.filter(message=message).count(), 1)
+
     def test_post_message_without_data(self):
         """
         Failed creation without post data.
