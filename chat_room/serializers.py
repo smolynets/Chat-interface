@@ -61,7 +61,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 class CommentModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = "text"
+        fields = "__all__"
 
 
 class MessageModelSerializer(serializers.ModelSerializer):
@@ -69,7 +69,7 @@ class MessageModelSerializer(serializers.ModelSerializer):
     MessageModelSerializer class.
     """
 
-    comments = CommentModelSerializer(many=True, read_only=True)
+    comments = CommentModelSerializer(many=True, required=False, allow_null=True)
 
     class Meta:
         model = Message
@@ -81,7 +81,14 @@ class MessageModelSerializer(serializers.ModelSerializer):
         """
 
         validated_data["author"] = self.context["request"].user
-        return Message.objects.create(**validated_data)
+        if "comments" in validated_data:
+            comments_data = validated_data.pop("comments")
+            message = Message.objects.create(**validated_data)
+            for comment_data in comments_data:
+                Comment.objects.create(message=message, **comment_data)
+        else:
+            message = Message.objects.create(**validated_data)
+        return message
 
     def update(self, instance, validated_data):
         """
