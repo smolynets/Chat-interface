@@ -21,11 +21,12 @@ class MessageTest(APITestBaseClass):
     This test checks next scenarios:
         1. Successful create message by post method with current user
         2. Successful creation of message without comments.
-        3. Failed creation without post data.
-        4. Successful got list by get method.
-        5. Successful changed message by put method.
-        6. Successful changed message by patch method.
-        7. Can't  get messages older 30 minutes.
+        3. Successful creation comment.
+        4. Failed creation without post data.
+        5. Successful got list by get method.
+        6. Successful changed message by put method.
+        7. Successful changed message by patch method.
+        8. Can't  get messages older 30 minutes.
     """
 
     def test_post_message(self):
