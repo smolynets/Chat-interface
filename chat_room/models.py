@@ -80,6 +80,7 @@ class Comment(models.Model):
     text = models.CharField(max_length=255, default="")
     message = models.ForeignKey(
         verbose_name=_("Message"),
+        related_name="comments",
         null=True,
         to="chat_room.Message",
         on_delete=models.CASCADE,
